@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import QuestionCard from './QuestionCard'
-import ReactCountdownClock from 'react-countdown-clock'
 
 class Quiz extends Component {
     state = {
@@ -14,7 +13,8 @@ class Quiz extends Component {
       }
       ],
       displayQuiz: true,
-      finalScore: 0
+      finalScore: 0,
+      position: 0
     }
 
   componentWillMount = async () => {
@@ -29,10 +29,16 @@ class Quiz extends Component {
   }
 
   calculateScore = (event) => {
+    const quiz = this.state.quiz;
     let finalScore = this.state.finalScore;
-    finalScore = (event.target.name === event.target.id) ? finalScore + 1 : finalScore + 0
+    let position = this.state.position;
+    let displayQuiz = true;
+    if(event){ finalScore = (event.target.name === event.target.id) ? finalScore + 1 : finalScore + 0 };
+    quiz.length > position + 1 ? position = position + 1 : displayQuiz = false
     this.setState({
-      finalScore: finalScore
+      finalScore: finalScore,
+      position : position,
+      displayQuiz : displayQuiz
     })
   }
 
@@ -43,22 +49,15 @@ class Quiz extends Component {
 
   render () {
     let quiz = this.state.quiz
-    let questionList = quiz.map(question => { 
-      return <QuestionCard question={question} id={quiz.indexOf(question) + 1} calculateScore={this.calculateScore} />
-    })
-
     return (
       <div className='container'>
         {this.state.displayQuiz ?  
           <div>
-            <ReactCountdownClock 
-            seconds={10}
-            color="blue"
-            alpha={0.9}
-            size={100}
-            onComplete={() => this.setState({displayQuiz: false})} 
-            />
-            {questionList}
+            <QuestionCard 
+            question={quiz[this.state.position]} 
+            id={this.state.position + 1} 
+            calculateScore={this.calculateScore}
+            timer={10} />
           </div> 
           :
           <div className='d-flex justify-content-center'>
